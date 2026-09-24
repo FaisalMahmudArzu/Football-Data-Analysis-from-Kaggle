@@ -333,29 +333,6 @@ This table will be updated as the project progresses.
 * Git
 * GitHub
 
----
-
-## 📁 Project Structure
-
-```text
-Football-Data-Analysis/
-│
-├── data/
-│   └── players_data-2026_2027.csv
-│
-├── notebooks/
-│   └── football_data_analysis.ipynb
-│
-├── src/
-│
-├── README.md
-├── pyproject.toml
-└── uv.lock
-```
-
-> The exact project structure may change as development continues.
-
----
 
 ## 🚀 Machine Learning Workflow
 
@@ -463,9 +440,6 @@ Planned improvements include:
 Software Engineering Student
 Aspiring AI Engineer
 
-GitHub: `FaisalMahmudArzu`
-
----
 
 ## 📚 Dataset Attribution
 
