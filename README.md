@@ -2,20 +2,28 @@
 
 A machine learning project using football player statistics to analyze player performance and estimate the number of goals scored by a player.
 
-The project covers the full workflow from data cleaning and exploratory analysis to preprocessing, regression models, hyperparameter tuning, model evaluation, and feature importance.
+This project covers the complete machine learning workflow, including data cleaning, exploratory data analysis, feature selection, preprocessing, regression modeling, hyperparameter tuning, model evaluation, error analysis, feature importance, permutation importance, and SHAP-based model interpretation.
 
-**Project Status:** 🚧 In Progress
+## 📌 Project Status
+
+**Part A: Completed ✅**
+
+The current project focuses on building and analyzing regression models for estimating player goals from football statistics.
 
 ## 📊 Dataset
 
 The dataset used in this project is **Football Players Stats 2026-2027**, created by **Hubert Sidorowicz** and available on Kaggle.
 
-**Dataset:**  
+### Dataset Source
+
 https://www.kaggle.com/datasets/hubertsidorowicz/football-players-stats-2026-2027
 
-The original dataset contains 2,034 rows and 102 columns.
+The original dataset contains:
 
-It contains information about:
+- **2,034 rows**
+- **102 columns**
+
+It includes information related to:
 
 - Player
 - Nation
@@ -36,27 +44,31 @@ It contains information about:
 
 ## 🎯 Project Goal
 
-The target variable in this project is `Gls`, which represents the total number of goals scored by a player.
+The target variable in this project is:
 
-Since `Gls` is a numerical value, this is treated as a **regression problem**.
+`Gls`
 
-The main idea is:
+`Gls` represents the total number of goals scored by a player.
 
-**Player statistics → Estimate goals scored**
+Since the target is numerical, this project is treated as a **regression problem**.
 
-The project is mainly focused on understanding the complete machine learning workflow and comparing different regression algorithms on the same dataset.
+The main objective is:
+
+**Player Statistics → Estimate Goals Scored**
+
+The main purpose of the project is to understand the complete machine learning workflow and compare different regression algorithms on the same dataset.
 
 ## 🧹 Data Cleaning
 
-Several cleaning and validation steps were performed before model training.
+Several data cleaning and validation steps were performed before model training.
 
 The cleaning process included:
 
 - Removing goalkeeper-specific columns
 - Removing goalkeeper records
 - Removing duplicated metadata columns
-- Removing ranking columns that were not useful for prediction
-- Removing target-derived features that could cause data leakage
+- Removing unnecessary ranking and metadata columns
+- Removing target-derived features that could introduce data leakage
 - Checking missing values
 - Checking duplicate rows
 - Checking constant numerical features
@@ -64,25 +76,35 @@ The cleaning process included:
 - Checking suspicious negative values
 - Removing the player identifier before model training
 
-There were **2,034 players in the original dataset**.
+There were **2,034 players** in the original dataset.
 
 After removing goalkeeper records, **1,919 players** remained.
 
-After the final cleaning and structural checks, the dataset used for the machine learning workflow contained **1,917 rows and 38 columns**.
+After the final cleaning and structural processing, the dataset used for the machine learning workflow contained:
+
+**1,917 rows × 38 columns**
+
+The final cleaned dataset contained:
+
+- No missing values
+- No duplicate rows
+- No constant numerical features
 
 ## 🔎 Exploratory Data Analysis
 
-Exploratory data analysis was performed to understand the dataset and the relationship between player statistics and goals.
+Exploratory Data Analysis was performed to understand the dataset and investigate the relationship between player statistics and goals.
 
 The analysis included:
 
-- Distribution of goals
-- Distribution of player positions
+- Goal distribution
+- Player position distribution
 - Average goals by position
 - Feature distributions
 - Scatter plots
 - Correlation analysis
-- Analysis of highly correlated feature pairs
+- Highly correlated feature analysis
+
+### Correlation with Goals
 
 Some of the strongest correlations with `Gls` were:
 
@@ -96,9 +118,16 @@ Some of the strongest correlations with `Gls` were:
 | `Starts` | 0.272 |
 | `Min` | 0.271 |
 
-`SoT` had the strongest correlation with goals among the analyzed features.
+`SoT` (Shots on Target) had the strongest correlation with `Gls` among the analyzed features.
 
-The analysis also showed strong relationships between several playing-time variables such as `MP`, `Starts`, `Min`, `90s`, `Mn/MP`, and `Min%`.
+The analysis also showed strong relationships between several playing-time variables, including:
+
+- `MP`
+- `Starts`
+- `Min`
+- `90s`
+- `Mn/MP`
+- `Min%`
 
 ## 🎯 Feature Selection
 
@@ -106,14 +135,18 @@ The target variable is:
 
 `Gls`
 
-The categorical features used in the model are:
+### Categorical Features
+
+The categorical features used for modeling were:
 
 - `Nation`
 - `Pos`
 - `Squad`
 - `Comp`
 
-The numerical features include:
+### Numerical Features
+
+The numerical features used were:
 
 - `Age`
 - `MP`
@@ -146,15 +179,17 @@ The numerical features include:
 - `TklW`
 - `OG`
 
+### Removed Features
+
 `Player` was removed because it is an identifier rather than a useful predictive feature.
 
-`PK` was also excluded because penalty goals are part of total goals. Using it to predict `Gls` could introduce target leakage.
+`PK` was excluded because penalty goals are part of total goals (`Gls`). Using `PK` to directly predict `Gls` could introduce target leakage.
 
-After removing the target, identifier, and leakage feature, there were **35 predictor variables** before preprocessing.
+After removing the target, identifier, and leakage feature, there were **35 predictor variables before preprocessing**.
 
 ## ⚙️ Data Preprocessing
 
-The dataset contains both numerical and categorical variables, so separate preprocessing was applied.
+The dataset contains both numerical and categorical features, so separate preprocessing techniques were applied.
 
 ### Numerical Features
 
@@ -164,43 +199,44 @@ Numerical features were standardized using:
 
 ### Categorical Features
 
-Categorical features were transformed using:
+Categorical features were encoded using:
 
-`OneHotEncoder`
+`OneHotEncoder(handle_unknown="ignore")`
 
-with:
+A `ColumnTransformer` was used to apply the appropriate preprocessing to each feature type.
 
-`handle_unknown="ignore"`
-
-A `ColumnTransformer` was used to apply the appropriate preprocessing to each type of feature.
-
-The preprocessing was fitted only on the training data and then used to transform both the training and testing data.
+The preprocessing was fitted only on the training data and then applied to both the training and testing data.
 
 This prevents information from the test set from influencing the preprocessing stage.
+
+After preprocessing and one-hot encoding:
+
+- Training shape: **(1533, 241)**
+- Testing shape: **(384, 241)**
 
 ## 🧪 Train/Test Split
 
 The dataset was divided into:
 
-- **80% training data**
-- **20% testing data**
+- **80% Training Data**
+- **20% Testing Data**
 
 The split used:
 
 `random_state=42`
 
-This makes the split reproducible.
-
 The resulting datasets were:
 
-- Training samples: **1,533**
-- Testing samples: **384**
+| Dataset | Samples |
+|---|---:|
+| Training | 1,533 |
+| Testing | 384 |
 
-The test set was kept separate for evaluating model performance on unseen data.
+The test set was kept separate and was used to evaluate model performance on unseen data.
 
 ## 🤖 Regression Models
 
-The following regression algorithms were tested:
+The following regression algorithms were evaluated:
 
 - Linear Regression
 - Ridge Regression
@@ -210,16 +246,15 @@ The following regression algorithms were tested:
 - Random Forest Regressor
 - Gradient Boosting Regressor
 - AdaBoost Regressor
+- XGBoost Regressor
 
-Hyperparameter tuning was also performed for selected models using `GridSearchCV`.
-
-XGBoost is planned as a later part of the project.
+Hyperparameter tuning was performed for selected models using `GridSearchCV`.
 
 ## 📏 Model Evaluation
 
 Since this is a regression problem, classification accuracy is not used as the primary evaluation metric.
 
-The models are evaluated using:
+The models were evaluated using:
 
 ### MAE
 
@@ -227,7 +262,7 @@ The models are evaluated using:
 
 Measures the average absolute difference between actual and predicted values.
 
-Lower is better.
+**Lower is better.**
 
 ### MSE
 
@@ -235,129 +270,111 @@ Lower is better.
 
 Measures the average squared prediction error and gives greater weight to larger errors.
 
-Lower is better.
+**Lower is better.**
 
 ### RMSE
 
 **Root Mean Squared Error**
 
-The square root of MSE. It expresses prediction error in the same unit as the target variable.
+The square root of MSE. It represents prediction error in the same unit as the target variable.
 
-Lower is better.
+**Lower is better.**
 
-### R² Score
+### R²
 
 **Coefficient of Determination**
 
-Measures how much of the variation in the target is explained by the model compared with a mean-based baseline.
+Measures how much of the variation in the target is explained by the model.
 
-Higher is generally better.
+**Higher is better.**
 
 R² should not be interpreted as classification accuracy.
 
-## 📈 Model Results
+## 📈 Model Comparison
 
-Current test-set results:
+The final test-set results were:
 
-| Model | MAE | MSE | RMSE | R² |
-|---|---:|---:|---:|---:|
-| Linear Regression | 0.342 | 0.261 | 0.511 | 0.562 |
-| Ridge Regression | 0.336 | 0.256 | 0.506 | 0.569 |
-| Lasso Regression | 0.284 | 0.230 | 0.480 | 0.613 |
-| KNN Regressor | 0.298 | 0.338 | 0.581 | 0.432 |
-| Tuned Decision Tree | 0.258 | 0.249 | 0.499 | 0.582 |
-| Tuned Random Forest | 0.244 | 0.218 | 0.467 | 0.633 |
-| Gradient Boosting | 0.252 | 0.205 | 0.452 | **0.656** |
-| Tuned AdaBoost | 0.254 | 0.212 | 0.460 | 0.644 |
+| Model | MAE | RMSE | R² |
+|---|---:|---:|---:|
+| **Gradient Boosting** | **0.2523** | **0.4522** | **0.6564** |
+| Tuned AdaBoost | 0.2537 | 0.4604 | 0.6439 |
+| Random Forest | 0.2465 | 0.4753 | 0.6205 |
+| Tuned XGBoost | 0.2558 | 0.4756 | 0.6199 |
+| Lasso Regression | 0.2835 | 0.4798 | 0.6133 |
+| Tuned Decision Tree | 0.2580 | 0.4990 | 0.5816 |
+| Ridge Regression | 0.3356 | 0.5063 | 0.5693 |
+| Linear Regression | 0.3420 | 0.5108 | 0.5616 |
+| KNN Regressor | 0.2979 | 0.5815 | 0.4319 |
 
-The current Gradient Boosting model has the highest test-set R² among the models tested so far, with an R² of **0.656**.
+### Final Gradient Boosting Results
 
-Its current results are:
+The Gradient Boosting model achieved:
 
-- MAE: **0.252**
-- MSE: **0.205**
-- RMSE: **0.452**
-- R²: **0.656**
+- **MAE:** 0.2523
+- **MSE:** 0.2045
+- **RMSE:** 0.4522
+- **R²:** 0.6564
+
+The model achieved the highest test-set R² among the evaluated models and the lowest RMSE.
+
+Random Forest achieved the lowest MAE, but Gradient Boosting achieved the strongest result according to R² and RMSE.
+
+Therefore, **Gradient Boosting was selected as the final model for model interpretation and analysis.**
 
 ## 🔬 Hyperparameter Tuning
 
-`GridSearchCV` with cross-validation was used to tune several models.
+Hyperparameter tuning was performed using `GridSearchCV` and cross-validation.
 
 ### Decision Tree
 
-Best parameters:
+The tuned Decision Tree used:
 
 - `max_depth = 5`
 - `min_samples_leaf = 2`
 - `min_samples_split = 20`
 
-Best cross-validation R²:
-
-**0.508**
-
-Test-set results:
-
-- MAE: 0.258
-- MSE: 0.249
-- RMSE: 0.499
-- R²: 0.582
-
-The original Decision Tree showed strong overfitting:
-
-- Training R²: **1.000**
-- Testing R²: **0.282**
-
-After tuning:
+Performance after tuning:
 
 - Training R²: **0.676**
 - Testing R²: **0.582**
 
+The original Decision Tree produced:
+
+- Training R²: **1.000**
+- Testing R²: **0.282**
+
+The large difference indicated strong overfitting.
+
+After tuning, the train-test gap was substantially reduced.
+
 ### Random Forest
 
-Best parameters:
+The tuned Random Forest used:
 
 - `max_depth = 10`
 - `min_samples_leaf = 2`
 - `min_samples_split = 10`
 - `n_estimators = 100`
 
-Best cross-validation R²:
+Results:
 
-**0.583**
-
-Test-set results:
-
-- MAE: 0.244
-- MSE: 0.218
-- RMSE: 0.467
-- R²: 0.633
-
-Training R²:
-
-**0.840**
-
-Testing R²:
-
-**0.633**
+- MAE: **0.2465**
+- RMSE: **0.4753**
+- R²: **0.6205**
 
 ### AdaBoost
 
-Best parameters:
+The tuned AdaBoost model used:
 
 - `learning_rate = 0.05`
 - `loss = "square"`
 - `n_estimators = 50`
 
-Best cross-validation R²:
+Results:
 
-**0.564**
-
-Test-set results:
-
-- MAE: 0.254
-- MSE: 0.212
-- RMSE: 0.460
-- R²: 0.644
+- MAE: **0.2537**
+- RMSE: **0.4604**
+- R²: **0.6439**
 
 Training R²:
 
@@ -367,117 +384,278 @@ Testing R²:
 
 **0.644**
 
-The train-test R² gap was **0.009**.
+Train-test gap:
 
-### Gradient Boosting
+**0.009**
 
-Current results:
+### XGBoost
 
-- MAE: 0.252
-- MSE: 0.205
-- RMSE: 0.452
-- R²: 0.656
+XGBoost was also trained and tuned using `GridSearchCV`.
+
+The best parameters found were:
+
+- `colsample_bytree = 0.8`
+- `learning_rate = 0.03`
+- `max_depth = 5`
+- `n_estimators = 100`
+- `subsample = 1.0`
+
+The initial XGBoost model produced:
+
+- MAE: **0.298**
+- MSE: **0.289**
+- RMSE: **0.538**
+- R²: **0.514**
 
 Training R²:
 
-**0.797**
+**0.992**
 
 Testing R²:
 
-**0.656**
+**0.514**
 
-Gradient Boosting has not yet gone through the same hyperparameter-tuning process in the current project.
+Train-test gap:
+
+**0.477**
+
+After hyperparameter tuning:
+
+- MAE: **0.2558**
+- RMSE: **0.4756**
+- R²: **0.6199**
+
+Training R²:
+
+**0.836**
+
+Testing R²:
+
+**0.620**
+
+Train-test gap:
+
+**0.216**
+
+Hyperparameter tuning substantially improved the XGBoost model compared with the initial version.
+
+## 📊 Error Analysis
+
+The final Gradient Boosting model was analyzed using:
+
+- Actual vs predicted values
+- Residual analysis
+- Absolute prediction error
+- Error distribution
+- Error by player position
+- Error by actual goal count
+
+The model generally performed better for players with lower goal counts.
+
+Players with higher goal totals were more difficult to predict because they were much less common in the dataset.
+
+### Error by Actual Goals
+
+| Actual Goals | Count | MAE |
+|---:|---:|---:|
+| 0 | 312 | 0.157 |
+| 1 | 46 | 0.485 |
+| 2 | 17 | 0.970 |
+| 3 | 5 | 0.594 |
+| 4 | 2 | 1.525 |
+| 6 | 2 | 1.629 |
+
+The model tends to underestimate some high-scoring players.
+
+This is related to the distribution of the target variable, where most players have relatively low goal counts and only a small number of players have high goal totals.
+
+## ⚽ Error by Position
+
+Prediction error was also analyzed by player position.
+
+| Position | Count | MAE |
+|---|---:|---:|
+| `MF,FW` | 3 | 0.479 |
+| `FW` | 60 | 0.433 |
+| `FW,MF` | 23 | 0.278 |
+| `MF` | 175 | 0.260 |
+| `MF,DF` | 7 | 0.173 |
+| `DF` | 103 | 0.146 |
+| `DF,MF` | 12 | 0.111 |
+| `DF,FW` | 1 | 0.005 |
+
+Position-level results should be interpreted carefully because some groups contain very few players.
 
 ## 🌲 Feature Importance
 
-Feature importance was analyzed using the tuned Random Forest model.
+Feature importance was analyzed using the Gradient Boosting model.
 
-The top features were:
+The most important features included:
 
-| Feature  | Importance |
-|---       |---         |
-| `SoT`    | 0.543899   |
-| `SoT/90` | 0.103936   |
-| `onG`    | 0.049840   |
-| `Crs`    | 0.038209   |
-| `+/-90`  | 0.032376   |
-| `Sh/90`  | 0.022966   |
-| `Sh`     | 0.015129   |
-| `Age`    | 0.014566   |
-| `TklW`   | 0.012043   |
-| `PPM`    | 0.011731   |
+| Feature | Importance |
+|---|---:|
+| `SoT` | 0.6068 |
+| `SoT/90` | 0.1035 |
+| `onG` | 0.0569 |
+| `Crs` | 0.0459 |
+| `+/-90` | 0.0233 |
+| `Sh` | 0.0223 |
+| `Sh/90` | 0.0195 |
+| `Fls` | 0.0131 |
+| `onGA` | 0.0098 |
+| `+/-` | 0.0095 |
 
-`SoT` was the most important feature according to the tuned Random Forest.
+`SoT` was by far the most important feature in the Gradient Boosting model.
 
-This is also consistent with the correlation analysis, where `SoT` had the strongest correlation with `Gls`.
+Feature importance describes how useful a feature was to the model. It does not mean that the feature directly causes goals.
 
-Feature importance does not mean that a feature directly causes goals. It indicates how useful that feature was to the model when making predictions.
+## 🔄 Permutation Importance
 
-## 📊 Overfitting Analysis
+Permutation importance was used to investigate how much the model's R² changed when individual features were randomly shuffled.
 
-The difference between training and testing performance was also examined.
+The strongest features were:
 
-The original Decision Tree had:
+| Feature | Mean Importance |
+|---|---:|
+| `SoT` | 0.6038 |
+| `onG` | 0.0708 |
+| `SoT/90` | 0.0603 |
+| `Crs` | 0.0242 |
+| `onGA` | 0.0228 |
+| `Pos_FW` | 0.0179 |
+| `Ast` | 0.0128 |
+| `PKatt` | 0.0072 |
+| `+/-` | 0.0045 |
+| `Starts` | 0.0035 |
+
+`SoT` was clearly the strongest feature in the permutation analysis as well.
+
+## 🧠 SHAP Analysis
+
+SHAP was used to understand how individual features influence the Gradient Boosting model's predictions.
+
+The strongest features according to mean absolute SHAP value were:
+
+| Feature | Mean Absolute SHAP |
+|---|---:|
+| `SoT` | 0.1849 |
+| `SoT/90` | 0.1293 |
+| `onG` | 0.0872 |
+| `+/-90` | 0.0279 |
+| `Compl` | 0.0254 |
+| `Pos_FW` | 0.0196 |
+| `Crs` | 0.0178 |
+| `Sh/90` | 0.0158 |
+| `onGA` | 0.0150 |
+| `Sh` | 0.0128 |
+
+The SHAP summary showed that higher values of `SoT` generally pushed the model's predictions toward higher goal estimates.
+
+The importance of `SoT` was consistent across:
+
+- Correlation analysis
+- Gradient Boosting feature importance
+- Permutation importance
+- SHAP analysis
+
+This makes `SoT` the clearest feature-level finding from the project.
+
+## 📉 Overfitting Analysis
+
+Training and testing R² values were compared to evaluate model generalization.
+
+### Original Decision Tree
 
 - Training R²: **1.000**
 - Testing R²: **0.282**
+- Gap: **0.718**
 
-This indicated strong overfitting.
-
-After tuning:
+### Tuned Decision Tree
 
 - Training R²: **0.676**
 - Testing R²: **0.582**
+- Gap: **0.094**
 
-The tuned Random Forest produced:
-
-- Training R²: **0.840**
-- Testing R²: **0.633**
-
-Gradient Boosting produced:
-
-- Training R²: **0.797**
-- Testing R²: **0.656**
-
-Tuned AdaBoost produced:
+### Tuned AdaBoost
 
 - Training R²: **0.653**
 - Testing R²: **0.644**
+- Gap: **0.009**
 
-Comparing training and testing performance helped identify how well each model generalized beyond the training data.
+### Gradient Boosting
 
-## 📝 Current Observations
+- Training R²: **0.797**
+- Testing R²: **0.656**
+- Gap: **0.141**
 
-The experiments so far show that ensemble models generally performed better than the individual KNN and linear models on this dataset.
+### Tuned XGBoost
 
-The current test-set results show:
+- Training R²: **0.836**
+- Testing R²: **0.620**
+- Gap: **0.216**
 
-- Gradient Boosting: **R² = 0.656**
-- Tuned AdaBoost: **R² = 0.644**
-- Tuned Random Forest: **R² = 0.633**
-- Lasso: **R² = 0.613**
+This comparison shows why training performance alone should not be used to evaluate a machine learning model.
 
-The KNN Regressor produced the lowest R² among the models tested so far at **0.432**.
+## 📝 Key Findings
 
-The results also show why hyperparameter tuning is useful. The untuned Decision Tree had a testing R² of only **0.282**, while the tuned version reached **0.582**.
+### 1. Gradient Boosting performed best overall
 
-## ⚠️ Important Modeling Note
+Gradient Boosting achieved the highest test-set R²:
 
-This project uses player statistics from the same season to estimate `Gls`.
+**R² = 0.6564**
 
-Therefore, this should **not** be considered a true next-season prediction system.
+and the lowest RMSE:
+
+**RMSE = 0.4522**
+
+among the evaluated models.
+
+### 2. Shooting-related features were highly informative
+
+Features such as:
+
+- `SoT`
+- `SoT/90`
+- `Sh`
+- `Sh/90`
+
+appeared repeatedly among the important features.
+
+### 3. `SoT` was the most consistent feature
+
+`SoT` was strongly associated with goals and was identified as the most important feature through multiple feature-analysis methods.
+
+### 4. High-scoring players were more difficult to predict
+
+The model performed much better for players with zero or low goal counts than for players with high goal totals.
+
+### 5. Hyperparameter tuning reduced overfitting
+
+The Decision Tree and XGBoost experiments demonstrated how hyperparameter tuning can improve generalization.
+
+### 6. Different metrics can produce different model rankings
+
+Random Forest achieved the lowest MAE, while Gradient Boosting achieved the highest R² and lowest RMSE.
+
+This is why multiple evaluation metrics were considered when comparing models.
+
+## ⚠️ Important Modeling Limitation
+
+This project uses player statistics from the **same season** to estimate `Gls`.
+
+Therefore, this project should **not** be interpreted as a true next-season prediction system.
 
 The current setup is:
 
-**Player statistics → Estimate goals**
+**Same-season player statistics → Estimate goals**
 
-A future-season prediction problem would instead look like:
+A true future-season prediction system would instead use:
 
 **Previous-season statistics → Predict next-season goals**
 
-That would require data from multiple seasons and a time-based train/test design.
+That would require data from multiple seasons and a time-based train/test strategy.
 
-Another limitation is that the target distribution is highly concentrated around low goal counts. Most players score few or zero goals, while only a small number score several goals. This makes the regression problem more difficult and should be considered when interpreting the evaluation metrics.
+Another limitation is the distribution of the target variable. Most players have relatively low goal counts, while players with high goal totals are much less common.
 
 ## 🎓 What I Learned
 
@@ -488,40 +666,31 @@ Through this project, I practiced:
 - Feature selection
 - Data leakage
 - Feature preprocessing
+- Standardization
 - One-hot encoding
-- Feature scaling
 - Train/test splitting
 - Regression
 - Regularization
 - Ensemble learning
+- Decision Trees
+- Random Forest
+- Gradient Boosting
+- AdaBoost
+- XGBoost
 - Cross-validation
 - Hyperparameter tuning
 - Overfitting analysis
 - Model evaluation
+- Residual analysis
+- Prediction error analysis
 - Feature importance
+- Permutation importance
+- SHAP
 - Model comparison
 
-The main purpose of the project is to understand the complete machine learning workflow rather than simply training a model and looking at one score.
+The main purpose of the project was to understand the complete machine learning workflow rather than simply training a model and reporting a single score.
 
-## 🚀 Next Steps
-
-The project is still in progress.
-
-Planned improvements include:
-
-- Hyperparameter tuning for Gradient Boosting
-- XGBoost Regression
-- XGBoost hyperparameter tuning
-- More detailed residual analysis
-- Prediction error analysis
-- Prediction visualization
-- Permutation importance
-- Final model comparison
-- Final model selection
-- Further feature engineering
-- Exploring model deployment
-
-## 🛠️ Technologies
+## 🛠️ Technologies Used
 
 - Python
 - Pandas
@@ -530,11 +699,50 @@ Planned improvements include:
 - Seaborn
 - Scikit-learn
 - XGBoost
+- SHAP
 - Jupyter Notebook
 - VS Code
 - uv
 - Git
 - GitHub
+
+## 📁 Project Structure
+
+The main machine learning workflow is implemented in a Jupyter Notebook.
+
+The notebook covers:
+
+1. Dataset Understanding
+2. Data Cleaning
+3. Exploratory Data Analysis
+4. Feature Selection
+5. Data Preprocessing
+6. Train/Test Split
+7. Regression Models
+8. Model Evaluation
+9. Hyperparameter Tuning
+10. Error Analysis
+11. Feature Importance
+12. Permutation Importance
+13. SHAP Analysis
+14. Final Model Comparison
+
+## 🚀 Future Work
+
+Part A of the project is complete.
+
+The next stage of the project will focus on turning the trained model into a practical machine learning application.
+
+Planned work includes:
+
+- Loading the trained model
+- Creating a prediction interface
+- Allowing users to enter player statistics
+- Displaying estimated goals
+- Building a Streamlit application
+- Deploying the application
+
+A future version may also use multiple seasons of data to build a true next-season prediction system.
 
 ## 👨‍💻 Author
 
@@ -547,7 +755,8 @@ Aspiring AI Engineer
 
 This project uses the **Football Players Stats 2026-2027** dataset created by **Hubert Sidorowicz** and hosted on Kaggle.
 
-Dataset:  
+Dataset:
+
 https://www.kaggle.com/datasets/hubertsidorowicz/football-players-stats-2026-2027
 
 This project is intended for educational and machine learning experimentation.
