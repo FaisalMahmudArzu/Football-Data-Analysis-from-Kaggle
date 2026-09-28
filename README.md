@@ -727,22 +727,6 @@ The notebook covers:
 13. SHAP Analysis
 14. Final Model Comparison
 
-## 🚀 Future Work
-
-Part A of the project is complete.
-
-The next stage of the project will focus on turning the trained model into a practical machine learning application.
-
-Planned work includes:
-
-- Loading the trained model
-- Creating a prediction interface
-- Allowing users to enter player statistics
-- Displaying estimated goals
-- Building a Streamlit application
-- Deploying the application
-
-A future version may also use multiple seasons of data to build a true next-season prediction system.
 
 ## 👨‍💻 Author
 
